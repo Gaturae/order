@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Vendor: Pivotal Software, Inc.
+Implementation-Title: order
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.order
+Build-Jdk: 1.7.0_51
+Built-By: wh
+Created-By: Maven Integration for Eclipse
+Implementation-URL: http://projects.spring.io/spring-boot/order/
+

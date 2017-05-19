@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.order.mapper.BorrowrInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.order.vo.BorrowrInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="borrower_name" property="borrowerName" jdbcType="VARCHAR" />
+    <result column="borrower_phone_num" property="borrowerPhoneNum" jdbcType="VARCHAR" />
+    <result column="home_address" property="homeAddress" jdbcType="VARCHAR" />
+    <result column="home_phone" property="homePhone" jdbcType="VARCHAR" />
+    <result column="marital_status" property="maritalStatus" jdbcType="INTEGER" />
+    <result column="spouse_company" property="spouseCompany" jdbcType="VARCHAR" />
+    <result column="spouse_name" property="spouseName" jdbcType="VARCHAR" />
+    <result column="spouse_phone_num" property="spousePhoneNum" jdbcType="VARCHAR" />
+    <result column="work_address" property="workAddress" jdbcType="VARCHAR" />
+    <result column="work_name" property="workName" jdbcType="VARCHAR" />
+    <result column="work_phone" property="workPhone" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="BaseResultMap_VO" type="com.order.vo.BlacklistVO" >
+  	<result column="b_id" property="bid" jdbcType="INTEGER" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="borrower_phone_num" property="borrowerPhoneNum" jdbcType="VARCHAR" />
+    <result column="spouse_phone_num" property="spousePhoneNum" jdbcType="VARCHAR" />
+    <result column="home_phone" property="homePhone" jdbcType="VARCHAR" />
+    <result column="home_address" property="homeAddress" jdbcType="VARCHAR" />
+    <result column="work_name" property="workName" jdbcType="VARCHAR" />
+    <result column="work_phone" property="workPhone" jdbcType="VARCHAR" />
+    <result column="work_address" property="workAddress" jdbcType="VARCHAR" />
+    <result column="contacts_name" property="contactsName" jdbcType="VARCHAR" />
+    <result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+    <result column="contacts_relation" property="contactsRelation" jdbcType="VARCHAR" />
+    <result column="confirm_at" property="confirmAt" jdbcType="TIMESTAMP" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="blacklist_tag" property="blacklistTag" jdbcType="VARCHAR" />
+    <result column="loan_name" property="loanName" jdbcType="VARCHAR" />
+    <result column="defriend_des" property="defriendDes" jdbcType="VARCHAR" />
+    <result column="is_interior" property="isInterior" jdbcType="VARCHAR" />
+    <result column="defriend_source" property="defriendSource" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, pid, borrower_name, borrower_phone_num, cid, home_address, home_phone, 
+    marital_status, spouse_company, spouse_name, spouse_phone_num, work_address, work_name, 
+    work_phone
+  </sql>
+  
+  <select id="queryBlackList" parameterType="com.order.vo.SplitRequest" resultMap="BaseResultMap_VO">
+  	<if test="matchType == 1">
+	  	SELECT btb.pid, btd.blacklist_tag, btd.confirm_at,
+	  			btd.comment, btd.loan_name, btd.is_interior, btd.defriend_source 
+	  	FROM bk_t_defriend_info btd
+		LEFT JOIN bk_t_borrowr_info btb ON btb.id = btd.bw_id
+		<where>
+			AND btb.pid = #{splitContent,jdbcType=VARCHAR}
+		</where>
+  	</if>
+  	<if test="matchType == 2">
+  		SELECT btb.borrower_phone_num, btb.spouse_phone_num, btd.blacklist_tag,
+				btd.confirm_at, btd.`comment`, btd.loan_name, btd.is_interior, btd.defriend_source
+	  	FROM bk_t_defriend_info btd
+		LEFT JOIN bk_t_borrowr_info btb ON btb.id = btd.bw_id
+		LEFT JOIN bk_t_contacts_info btc ON btc.bw_id = btb.id
+		<where>
+			AND btb.borrower_phone_num = #{splitContent,jdbcType=VARCHAR}
+			OR btb.spouse_phone_num = #{splitContent,jdbcType=VARCHAR}
+			OR btc.contacts_phone = #{splitContent,jdbcType=VARCHAR}
+		</where>
+  	</if>
+  	<if test="matchType == 3">
+  		SELECT btb.home_phone, btd.blacklist_tag, btd.confirm_at, btd.comment,
+  				btd.loan_name, btd.is_interior, btd.defriend_source
+	  	FROM bk_t_defriend_info btd
+		LEFT JOIN bk_t_borrowr_info btb ON btb.id = btd.bw_id
+		<where>
+			AND btb.home_phone LIKE CONCAT('%', #{splitContent,jdbcType=VARCHAR}, '%')
+		</where>
+  	</if>
+  	<if test="matchType == 4">
+  		SELECT btb.home_address, btb.work_address, btd.blacklist_tag, btd.confirm_at,
+  				btd.comment, btd.loan_name, btd.is_interior, btd.defriend_source
+	  	FROM bk_t_defriend_info btd
+		LEFT JOIN bk_t_borrowr_info btb ON btb.id = btd.bw_id
+		<where>
+			AND btb.home_address = #{splitContent,jdbcType=VARCHAR}
+			OR btb.work_address = #{splitContent,jdbcType=VARCHAR}
+		</where>
+  	</if>
+  	<if test="matchType == 5">
+  		SELECT btb.work_name, btd.blacklist_tag, btd.confirm_at, btd.comment,
+				btd.loan_name, btd.is_interior, btd.defriend_source
+	  	FROM bk_t_defriend_info btd
+		LEFT JOIN bk_t_borrowr_info btb ON btb.id = btd.bw_id
+		<where>
+			AND btb.work_name = #{splitContent,jdbcType=VARCHAR}
+		</where>
+  	</if>
+  </select>
+  
+</mapper>
